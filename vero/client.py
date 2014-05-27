@@ -3,28 +3,32 @@ import collections
 import requests
 
 Endpoint = collections.namedtuple('Endpoint', ['method', 'url'])
-
+VERO_BASE_URL = 'https://api.getvero.com/'
 
 class VeroEndpoints(object):
     """Endpoints for Vero API calls."""
-    VERO_BASE_URL = 'https://api.getvero.com/'
-    ADD_USER = Endpoint(method='POST', url=VERO_BASE_URL + 'api/v2/users/track')
-    EDIT_USER = Endpoint(method='PUT', url=VERO_BASE_URL + 'api/v2/users/edit')
-    EDIT_TAGS = Endpoint(method='PUT', url=VERO_BASE_URL + 'api/v2/users/tags/edit')
-    UNSUBSCRIBE_USER = Endpoint(method='POST', url=VERO_BASE_URL + 'api/v2/users/unsubscribe')
-    ADD_EVENT = Endpoint(method='POST', url=VERO_BASE_URL + 'api/v2/events/track')
+    
+    ADD_USER = Endpoint(method='POST', url='api/v2/users/track')
+    EDIT_USER = Endpoint(method='PUT', url='api/v2/users/edit')
+    EDIT_TAGS = Endpoint(method='PUT', url='api/v2/users/tags/edit')
+    UNSUBSCRIBE_USER = Endpoint(method='POST', url='api/v2/users/unsubscribe')
+    RESUBSCRIBE_USER = Endpoint(method='POST', url='api/v2/users/resubscribe')
+
+    ADD_EVENT = Endpoint(method='POST', url='api/v2/events/track')
 
 
 class VeroEventLogger(object):
     """Add and edit Vero events and users."""
 
-    @classmethod
-    def _fire_request(cls, endpoint, payload):
-        json_payload = json.dumps(payload)
-        return requests.request(endpoint.method, endpoint.url, data=json_payload)
-
-    def __init__(self, auth_token):
+    def __init__(self, auth_token, base_url=None):
         self.auth_token = auth_token
+        self.base_url = base_url or VERO_BASE_URL
+
+
+    def _fire_request(self, endpoint, payload):
+        json_payload = json.dumps(payload)
+        return requests.request(endpoint.method, self.base_url + endpoint.url, data=json_payload)
+        
 
     def add_user(self, user_id, user_data, user_email=None, development_mode=False):
         """Add a new user and return the https request."""
@@ -75,6 +79,14 @@ class VeroEventLogger(object):
             'development_mode': development_mode
         }
         return self._fire_request(VeroEndpoints.UNSUBSCRIBE_USER, payload)
+
+    def resubscribe_user(self, user_id, development_mode=False):
+        payload = {
+            'auth_token': self.auth_token,
+            'id': user_id,
+            'development_mode': development_mode
+        }
+        return self._fire_request(VeroEndpoints.RESUBSCRIBE_USER, payload)
 
     def add_event(self, event_name, event_data, user_id, user_email=None, development_mode=False):
         """Add a new event and return the https request."""

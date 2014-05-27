@@ -23,7 +23,7 @@ setup(
     zip_safe=True,
     install_requires=requires,
     tests_require=tests_require,
-    test_suite='vero.tests.client_test',
+    test_suite='client_test',
     license=open('LICENSE.rst').read(),
     classifiers=(
         'Development Status :: 5 - Production/Stable',
