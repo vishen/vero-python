@@ -99,6 +99,14 @@ Unsubscribe the user from triggering future events.
     >>> user_id = 1
     >>> logger.unsubscribe_user(user_id)
 
+Resubscribe user
+~~~~~~~~~~~~~~~~
+Resubscribe the user from triggering future events.
+::
+
+    >>> user_id = 1
+    >>> logger.resubscribe_user(user_id)
+
 Add event
 ~~~~~~~~~
 Note: adding an event with a user id that doesn't exist will create the user.
